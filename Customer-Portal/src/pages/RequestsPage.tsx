@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { signOut } from "../services/authService";
 import type { ProtectedRouteProps } from "../components/auth/ProtectedRoute";
+import { supabase } from "../lib/supabase";
 
 export default function RequestsPage({ session }: ProtectedRouteProps) {
   const navigate = useNavigate();
@@ -19,6 +20,13 @@ export default function RequestsPage({ session }: ProtectedRouteProps) {
     }
   };
 
+  const testProfileAccess = async () => {
+    const { data, error } = await supabase.from("profiles").select("*");
+
+    console.log("Profile:", data);
+    console.log("Error:", error);
+  };
+
   return (
     <div>
       <h1>Customer Requests</h1>
@@ -30,6 +38,8 @@ export default function RequestsPage({ session }: ProtectedRouteProps) {
       <button onClick={handleLogout} disabled={loading}>
         {loading ? "Signing out..." : "Sign Out"}
       </button>
+
+      <button onClick={testProfileAccess}>press to testProfileAccess fn</button>
     </div>
   );
 }
