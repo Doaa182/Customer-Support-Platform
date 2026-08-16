@@ -38,24 +38,6 @@ export default function App() {
     };
   }, []);
 
-  const testProfileAccess = async () => {
-    const { data, error } = await supabase.from("profiles").select("*");
-
-    console.log("Profile:", data);
-    console.log("Error:", error);
-  };
-
-  if (session) {
-    testProfileAccess();
-
-    return (
-      <div>
-        <h1>Customer Requests</h1>
-        <p>Welcome from testProfileAccess fn</p>
-      </div>
-    );
-  }
-
   if (loading) {
     return <p>Checking authentication...</p>;
   }
