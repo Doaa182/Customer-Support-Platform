@@ -3,7 +3,44 @@
 
   <p>Welcome, Agent!</p>
 
-  <p>Your agent workspace will appear here.</p>
-
   <button (click)="signOut()">Sign Out</button>
+
+  <hr />
+
+  <h2>Support Requests</h2>
+
+  @if (loading) {
+    <p>Loading requests...</p>
+  }
+
+  @if (!loading && error) {
+    <p>{{ error }}</p>
+  }
+
+  @if (!loading && !error && requests.length === 0) {
+    <p>No support requests found.</p>
+  }
+
+  @if (!loading && !error && requests.length > 0) {
+    @for (request of requests; track request.id) {
+      <article>
+        <h3>{{ request.reference }}</h3>
+
+        <p>{{ request.description }}</p>
+
+        <p>Category: {{ request.category }}</p>
+
+        <p>Urgency: {{ request.urgency }}</p>
+
+        <p>Status: {{ request.status }}</p>
+
+        <p>
+          Assigned:
+          {{ request.assigned_agent_id ? 'Assigned' : 'Unassigned' }}
+        </p>
+      </article>
+
+      <hr />
+    }
+  }
 </section>

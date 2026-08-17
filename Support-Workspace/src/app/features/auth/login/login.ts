@@ -26,11 +26,7 @@ export class Login {
 
   async login(): Promise<void> {
     const success = await this.authService.signIn(this.email, this.password);
-
-    console.log('Login success:', success);
-    console.log('User:', this.authService.user());
-    console.log('Profile:', this.authService.profile());
-
+    
     if (success && this.authService.profile()?.role === 'agent') {
       await this.router.navigate(['/agent']);
     } else if (success && this.authService.profile()?.role === 'manager') {
