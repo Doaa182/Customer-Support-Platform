@@ -6,6 +6,10 @@ export const managerGuard = async () => {
   const authService = inject(AuthService);
   const router = inject(Router);
 
+  while (!authService.initialized()) {
+    await new Promise((resolve) => setTimeout(resolve, 50));
+  }
+
   const user = authService.user();
   const profile = authService.profile();
 
