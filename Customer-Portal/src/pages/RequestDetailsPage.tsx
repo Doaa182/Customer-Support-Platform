@@ -1,7 +1,11 @@
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { supabase } from "../lib/supabase";
-import { getRequestMessages, type Message } from "../services/messageService";
+import {
+  createCustomerMessage,
+  getRequestMessages,
+  type Message,
+} from "../services/messageService";
 
 interface RequestDetails {
   id: string;
@@ -30,6 +34,11 @@ export default function RequestDetailsPage() {
   const [messagesLoading, setMessagesLoading] = useState(true);
   const [error, setError] = useState("");
   const [messagesError, setMessagesError] = useState("");
+
+  const [messageContent, setMessageContent] = useState("");
+  const [sendingMessage, setSendingMessage] = useState(false);
+  const [sendMessageError, setSendMessageError] = useState("");
+  const [sendMessageSuccess, setSendMessageSuccess] = useState("");
 
   useEffect(() => {
     const loadRequest = async () => {
@@ -92,6 +101,43 @@ export default function RequestDetailsPage() {
 
     loadMessages();
   }, [id]);
+
+  const handleSendMessage = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+
+    if (!id || !messageContent.trim()) {
+      return;
+    }
+
+    try {
+      setSendingMessage(true);
+      setSendMessageError("");
+      setSendMessageSuccess("");
+
+      const { error } = await createCustomerMessage(id, messageContent.trim());
+
+      if (error) {
+        throw new Error(error.message);
+      }
+
+      setMessageContent("");
+      setSendMessageSuccess("Message sent successfully.");
+
+      const { data, error: messagesError } = await getRequestMessages(id);
+
+      if (messagesError) {
+        throw new Error(messagesError.message);
+      }
+
+      setMessages(data ?? []);
+    } catch (error) {
+      setSendMessageError(
+        error instanceof Error ? error.message : "Failed to send message.",
+      );
+    } finally {
+      setSendingMessage(false);
+    }
+  };
 
   if (loading) {
     return <p>Loading request...</p>;
@@ -158,6 +204,33 @@ export default function RequestDetailsPage() {
           ))}
         </div>
       )}
+
+      <h2>Add Information</h2>
+
+      <form onSubmit={handleSendMessage}>
+        <div>
+          <label htmlFor="message">Message</label>
+
+          <textarea
+            id="message"
+            value={messageContent}
+            onChange={(event) => setMessageContent(event.target.value)}
+            placeholder="Add more information about your request..."
+            required
+          />
+        </div>
+
+        {sendMessageError && <p>{sendMessageError}</p>}
+
+        {sendMessageSuccess && <p>{sendMessageSuccess}</p>}
+
+        <button
+          type="submit"
+          disabled={sendingMessage || !messageContent.trim()}
+        >
+          {sendingMessage ? "Sending..." : "Send Message"}
+        </button>
+      </form>
     </section>
   );
 }

@@ -16,3 +16,23 @@ export const getRequestMessages = async (requestId: string) => {
     .eq("request_id", requestId)
     .order("created_at", { ascending: true });
 };
+
+export const createCustomerMessage = async (
+  requestId: string,
+  content: string,
+) => {
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    throw new Error("User is not authenticated");
+  }
+
+  return await supabase.from("messages").insert({
+    request_id: requestId,
+    author_id: user.id,
+    content,
+    type: "customer",
+  });
+};
