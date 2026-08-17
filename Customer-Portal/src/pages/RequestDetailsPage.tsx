@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { supabase } from "../lib/supabase";
+import { getRequestMessages, type Message } from "../services/messageService";
 
 interface RequestDetails {
   id: string;
@@ -23,13 +24,17 @@ export default function RequestDetailsPage() {
   const { id } = useParams<{ id: string }>();
 
   const [request, setRequest] = useState<RequestDetails | null>(null);
+  const [messages, setMessages] = useState<Message[]>([]);
+
   const [loading, setLoading] = useState(true);
+  const [messagesLoading, setMessagesLoading] = useState(true);
   const [error, setError] = useState("");
+  const [messagesError, setMessagesError] = useState("");
 
   useEffect(() => {
     const loadRequest = async () => {
       if (!id) {
-        setError("Request not found.");
+        setError("Request not found or you don't have permission to view it.");
         setLoading(false);
         return;
       }
@@ -51,18 +56,41 @@ export default function RequestDetailsPage() {
         }
 
         setRequest(data);
-      } catch (error) {
-        setError(
-          error instanceof Error
-            ? error.message
-            : "Failed to load the request.",
-        );
+      } catch {
+        setError("Request not found or you don't have permission to view it.");
       } finally {
         setLoading(false);
       }
     };
 
     loadRequest();
+  }, [id]);
+
+  useEffect(() => {
+    const loadMessages = async () => {
+      if (!id) {
+        return;
+      }
+
+      try {
+        setMessagesLoading(true);
+        setMessagesError("");
+
+        const { data, error } = await getRequestMessages(id);
+
+        if (error) {
+          throw new Error(error.message);
+        }
+
+        setMessages(data ?? []);
+      } catch {
+        setMessagesError("Failed to load the conversation.");
+      } finally {
+        setMessagesLoading(false);
+      }
+    };
+
+    loadMessages();
   }, [id]);
 
   if (loading) {
@@ -107,6 +135,29 @@ export default function RequestDetailsPage() {
       <p>Last updated: {request.updated_at}</p>
 
       {request.resolved_at && <p>Resolved: {request.resolved_at}</p>}
+
+      <hr />
+
+      <h2>Conversation</h2>
+
+      {messagesLoading && <p>Loading conversation...</p>}
+
+      {messagesError && <p>{messagesError}</p>}
+
+      {!messagesLoading && !messagesError && messages.length === 0 && (
+        <p>No messages yet.</p>
+      )}
+
+      {!messagesLoading && !messagesError && messages.length > 0 && (
+        <div>
+          {messages.map((message) => (
+            <article key={message.id}>
+              <p>{message.content}</p>
+              <small>{message.created_at}</small>
+            </article>
+          ))}
+        </div>
+      )}
     </section>
   );
 }
