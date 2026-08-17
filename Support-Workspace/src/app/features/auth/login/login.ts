@@ -33,6 +33,8 @@ export class Login {
 
     if (success && this.authService.profile()?.role === 'agent') {
       await this.router.navigate(['/agent']);
+    } else if (success && this.authService.profile()?.role === 'manager') {
+      await this.router.navigate(['/manager']);
     }
   }
 }

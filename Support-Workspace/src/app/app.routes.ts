@@ -1,6 +1,8 @@
 import { Routes } from '@angular/router';
-import { Dashboard } from './features/agent/dashboard/dashboard';
 import { agentGuard } from './core/guards/agent.guard';
+import { managerGuard } from './core/guards/manager.guard';
+import { ManagerDashboard } from './features/manager-dashboard/manager-dashboard';
+import { AgentDashboard } from './features/agent-dashboard/agent-dashboard';
 
 export const routes: Routes = [
   {
@@ -9,8 +11,13 @@ export const routes: Routes = [
   },
   {
     path: 'agent',
-    component: Dashboard,
+    component: AgentDashboard,
     canActivate: [agentGuard],
+  },
+  {
+    path: 'manager',
+    component: ManagerDashboard,
+    canActivate: [managerGuard],
   },
   {
     path: '',
