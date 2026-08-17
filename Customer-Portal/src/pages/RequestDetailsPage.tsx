@@ -139,6 +139,28 @@ export default function RequestDetailsPage() {
     }
   };
 
+  const getCustomerStatusLabel = (status: string) => {
+    switch (status) {
+      case "open":
+        return "New";
+
+      case "in_progress":
+        return "Being handled";
+
+      case "waiting_for_customer":
+        return "Waiting for your response";
+
+      case "resolved":
+        return "Resolved";
+
+      case "closed":
+        return "Completed";
+
+      default:
+        return status;
+    }
+  };
+
   if (loading) {
     return <p>Loading request...</p>;
   }
@@ -174,7 +196,7 @@ export default function RequestDetailsPage() {
 
       <p>Urgency: {request.urgency}</p>
 
-      <p>Status: {request.status}</p>
+      <p>Status: {getCustomerStatusLabel(request.status)}</p>
 
       <p>Created: {request.created_at}</p>
 

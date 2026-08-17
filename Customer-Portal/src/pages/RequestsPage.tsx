@@ -19,6 +19,28 @@ export default function RequestsPage({ session }: ProtectedRouteProps) {
     }
   };
 
+  const getCustomerStatusLabel = (status: string) => {
+    switch (status) {
+      case "open":
+        return "New";
+
+      case "in_progress":
+        return "Being handled";
+
+      case "waiting_for_customer":
+        return "Waiting for your response";
+
+      case "resolved":
+        return "Resolved";
+
+      case "closed":
+        return "Completed";
+
+      default:
+        return status;
+    }
+  };
+
   useEffect(() => {
     const loadRequests = async () => {
       try {
@@ -80,7 +102,7 @@ export default function RequestsPage({ session }: ProtectedRouteProps) {
 
               <p>Urgency: {request.urgency}</p>
 
-              <p>Status: {request.status}</p>
+              <p>Status: {getCustomerStatusLabel(request.status)}</p>
 
               <Link to={`/requests/${request.id}`}>View Request</Link>
             </article>
