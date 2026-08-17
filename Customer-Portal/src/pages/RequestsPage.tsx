@@ -1,48 +1,50 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { signOut } from "../services/authService";
 import type { ProtectedRouteProps } from "../components/auth/ProtectedRoute";
-import { supabase } from "../lib/supabase";
+import { getMyRequests, type Request } from "../services/requestService";
 
 export default function RequestsPage({ session }: ProtectedRouteProps) {
   const navigate = useNavigate();
-  const [loading, setLoading] = useState(false);
+
+  const [requests, setRequests] = useState<Request[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
   const handleLogout = async () => {
-    setLoading(true);
-
     const { error } = await signOut();
-
-    setLoading(false);
 
     if (!error) {
       navigate("/login");
     }
   };
 
-  const testCurrentUser = async () => {
-    const {
-      data: { user },
-      error: userError,
-    } = await supabase.auth.getUser();
+  useEffect(() => {
+    const loadRequests = async () => {
+      try {
+        setLoading(true);
+        setError("");
 
-    console.log("Current user:", user);
-    console.log("User error:", userError);
+        const { data, error } = await getMyRequests();
 
-    if (!user) {
-      console.log("No authenticated user");
-      return;
-    }
+        if (error) {
+          throw new Error(error.message);
+        }
 
-    const { data: profile, error: profileError } = await supabase
-      .from("profiles")
-      .select("*")
-      .eq("id", user.id)
-      .single();
+        setRequests(data ?? []);
+      } catch (error) {
+        setError(
+          error instanceof Error
+            ? error.message
+            : "Failed to load your requests.",
+        );
+      } finally {
+        setLoading(false);
+      }
+    };
 
-    console.log("Current profile:", profile);
-    console.log("Profile error:", profileError);
-  };
+    loadRequests();
+  }, []);
 
   return (
     <div>
@@ -52,15 +54,39 @@ export default function RequestsPage({ session }: ProtectedRouteProps) {
 
       <p>Logged in as: {session?.user.email}</p>
 
-      <button onClick={handleLogout} disabled={loading}>
-        {loading ? "Signing out..." : "Sign Out"}
-      </button>
-
-      <button type="button" onClick={testCurrentUser}>
-        Test Current User
-      </button>
+      <button onClick={handleLogout}>Sign Out</button>
 
       <Link to="/requests/create">Create Support Request</Link>
+
+      {loading && <p>Loading your requests...</p>}
+
+      {error && <p>{error}</p>}
+
+      {!loading && !error && requests.length === 0 && (
+        <p>You don't have any support requests yet.</p>
+      )}
+
+      {!loading && !error && requests.length > 0 && (
+        <section>
+          <h2>My Requests</h2>
+
+          {requests.map((request) => (
+            <article key={request.id}>
+              <h3>{request.reference}</h3>
+
+              <p>{request.description}</p>
+
+              <p>Category: {request.category}</p>
+
+              <p>Urgency: {request.urgency}</p>
+
+              <p>Status: {request.status}</p>
+
+              <Link to={`/requests/${request.id}`}>View Request</Link>
+            </article>
+          ))}
+        </section>
+      )}
     </div>
   );
 }
