@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { signOut } from "../services/authService";
 import type { ProtectedRouteProps } from "../components/auth/ProtectedRoute";
 import { supabase } from "../lib/supabase";
@@ -59,6 +59,8 @@ export default function RequestsPage({ session }: ProtectedRouteProps) {
       <button type="button" onClick={testCurrentUser}>
         Test Current User
       </button>
+
+      <Link to="/requests/create">Create Support Request</Link>
     </div>
   );
 }

@@ -12,6 +12,7 @@ import LoginPage from "./pages/LoginPage";
 import SignupPage from "./pages/SignupPage";
 import RequestsPage from "./pages/RequestsPage";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
+import CreateRequestPage from "./pages/CreateRequestPage";
 
 export default function App() {
   const [session, setSession] = useState<Session | null>(null);
@@ -61,6 +62,7 @@ export default function App() {
 
       <Route element={<ProtectedRoute session={session} />}>
         <Route path="/requests" element={<RequestsPage session={session} />} />
+        <Route path="/requests/create" element={<CreateRequestPage />} />
       </Route>
     </Routes>
   );
