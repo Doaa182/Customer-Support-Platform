@@ -40,4 +40,27 @@ export class RequestService {
       error: null,
     };
   }
+
+  async assignToCurrentAgent(requestId: string): Promise<{ error: string | null }> {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) {
+      return { error: 'You must be signed in.' };
+    }
+
+    const { error } = await supabase
+      .from('requests')
+      .update({
+        assigned_agent_id: user.id,
+        status: 'in_progress',
+      })
+      .eq('id', requestId)
+      .is('assigned_agent_id', null);
+
+    return {
+      error: error ? error.message : null,
+    };
+  }
 }

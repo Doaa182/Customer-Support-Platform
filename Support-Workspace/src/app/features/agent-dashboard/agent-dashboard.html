@@ -38,6 +38,10 @@
           Assigned:
           {{ request.assigned_agent_id ? 'Assigned' : 'Unassigned' }}
         </p>
+
+        @if (!request.assigned_agent_id) {
+          <button type="button" (click)="takeRequest(request.id)">Take Responsibility</button>
+        }
       </article>
 
       <hr />

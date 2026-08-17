@@ -27,7 +27,6 @@ export class AgentDashboard implements OnInit {
     this.error = '';
 
     const result = await this.requestService.getRequests();
-    console.log('Agent requests result:', result);
 
     if (result.error) {
       this.error = result.error;
@@ -37,7 +36,17 @@ export class AgentDashboard implements OnInit {
 
     this.requests = result.data ?? [];
     this.loading = false;
-    console.log('Loading state:', this.loading);
+  }
+
+  async takeRequest(requestId: string): Promise<void> {
+    const result = await this.requestService.assignToCurrentAgent(requestId);
+
+    if (result.error) {
+      this.error = result.error;
+      return;
+    }
+
+    await this.loadRequests();
   }
 
   async signOut(): Promise<void> {
