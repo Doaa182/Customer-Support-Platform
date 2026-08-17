@@ -1,6 +1,5 @@
 import { Component, signal } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-import { supabase } from './core/supabase';
 
 @Component({
   selector: 'app-root',
@@ -10,7 +9,4 @@ import { supabase } from './core/supabase';
 })
 export class App {
   protected readonly title = signal('Support-Workspace');
-  constructor() {
-    console.log('Supabase client:', supabase);
-  }
 }
