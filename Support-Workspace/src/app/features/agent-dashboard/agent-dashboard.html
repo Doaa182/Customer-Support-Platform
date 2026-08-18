@@ -25,8 +25,51 @@
     <h2>Support Requests</h2>
 
     <input type="search" [(ngModel)]="searchTerm" placeholder="Search requests..." />
+    <div>
+      <label for="status">Status</label>
+
+      <select id="status" [(ngModel)]="statusFilter">
+        <option value="">All statuses</option>
+        <option value="open">Open</option>
+        <option value="in_progress">In Progress</option>
+        <option value="resolved">Resolved</option>
+      </select>
+    </div>
+
+    <div>
+      <label for="urgency">Urgency</label>
+
+      <select id="urgency" [(ngModel)]="urgencyFilter">
+        <option value="">All urgencies</option>
+        <option value="high">High</option>
+        <option value="medium">Medium</option>
+        <option value="low">Low</option>
+      </select>
+    </div>
+
+    <div>
+      <label for="category">Category</label>
+
+      <select id="category" [(ngModel)]="categoryFilter">
+        <option value="">All categories</option>
+        <option value="general">General</option>
+        <option value="technical">Technical</option>
+        <option value="billing">Billing</option>
+      </select>
+    </div>
+
+    <div>
+      <label for="assignment">Assignment</label>
+
+      <select id="assignment" [(ngModel)]="assignmentFilter">
+        <option value="">All requests</option>
+        <option value="assigned">Assigned</option>
+        <option value="unassigned">Unassigned</option>
+      </select>
+    </div>
+
     @if (filteredRequests.length === 0) {
-      <p>No support requests found.</p>
+      <p>No requests match your search and filters.</p>
     } @else {
       @for (request of filteredRequests; track request.id) {
         <article>

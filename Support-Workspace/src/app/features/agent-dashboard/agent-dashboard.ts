@@ -19,6 +19,11 @@ export class AgentDashboard implements OnInit {
   requests: SupportRequest[] = [];
   searchTerm = '';
 
+  statusFilter = '';
+  urgencyFilter = '';
+  categoryFilter = '';
+  assignmentFilter = '';
+
   loading = true;
   error = '';
 
@@ -58,18 +63,30 @@ export class AgentDashboard implements OnInit {
   get filteredRequests(): SupportRequest[] {
     const term = this.searchTerm.trim().toLowerCase();
 
-    if (!term) {
-      return this.requests;
-    }
-
-    return this.requests.filter(
-      (request) =>
+    return this.requests.filter((request) => {
+      const matchesSearch =
+        !term ||
         request.reference.toLowerCase().includes(term) ||
         request.description.toLowerCase().includes(term) ||
         request.category.toLowerCase().includes(term) ||
         request.urgency.toLowerCase().includes(term) ||
-        request.status.toLowerCase().includes(term),
-    );
+        request.status.toLowerCase().includes(term);
+
+      const matchesStatus = !this.statusFilter || request.status === this.statusFilter;
+
+      const matchesUrgency = !this.urgencyFilter || request.urgency === this.urgencyFilter;
+
+      const matchesCategory = !this.categoryFilter || request.category === this.categoryFilter;
+
+      const matchesAssignment =
+        !this.assignmentFilter ||
+        (this.assignmentFilter === 'assigned' && !!request.assigned_agent_id) ||
+        (this.assignmentFilter === 'unassigned' && !request.assigned_agent_id);
+
+      return (
+        matchesSearch && matchesStatus && matchesUrgency && matchesCategory && matchesAssignment
+      );
+    });
   }
 
   async signOut(): Promise<void> {
