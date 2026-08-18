@@ -17,6 +17,7 @@ import RequestDetailsPage from "./pages/RequestDetailsPage/RequestDetailsPage";
 import NotFoundPage from "./pages/NotFoundPage/NotFoundPage";
 import ThemeToggle from "./components/theme-toggle/ThemeToggle";
 import UnauthorizedPage from "./pages/UnauthorizedPage/UnauthorizedPage";
+import LoadingSpinner from "./components/LoadingSpinner/LoadingSpinner";
 
 export default function App() {
   const [session, setSession] = useState<Session | null>(null);
@@ -44,12 +45,13 @@ export default function App() {
   }, []);
 
   if (loading) {
-    return <p>Checking authentication...</p>;
+    return <LoadingSpinner message="Checking authentication..." fullScreen />;
   }
 
   return (
     <>
       <ThemeToggle />
+
       <div className="app-content">
         <Routes>
           <Route

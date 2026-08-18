@@ -4,6 +4,7 @@ import { signOut } from "../../services/authService";
 import type { ProtectedRouteProps } from "../../components/auth/ProtectedRoute";
 import { getMyRequests, type Request } from "../../services/requestService";
 import styles from "./RequestsPage.module.css";
+import LoadingSpinner from "../../components/LoadingSpinner/LoadingSpinner";
 
 export default function RequestsPage({ session }: ProtectedRouteProps) {
   const navigate = useNavigate();
@@ -99,7 +100,7 @@ export default function RequestsPage({ session }: ProtectedRouteProps) {
 
       {loading && (
         <div className={styles.stateMessage}>
-          <p>Loading your requests...</p>
+          <LoadingSpinner message="Loading requests..." />
         </div>
       )}
 

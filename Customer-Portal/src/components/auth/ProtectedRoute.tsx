@@ -3,6 +3,7 @@ import { Navigate, Outlet } from "react-router-dom";
 import type { Session } from "@supabase/supabase-js";
 
 import { getCurrentUserProfile } from "../../services/authService";
+import LoadingSpinner from "../LoadingSpinner/LoadingSpinner";
 
 export interface ProtectedRouteProps {
   session: Session | null;
@@ -33,7 +34,7 @@ export default function ProtectedRoute({ session }: ProtectedRouteProps) {
   }
 
   if (checkingRole) {
-    return <p>Checking authorization...</p>;
+    return <LoadingSpinner message="Checking authorization..." fullScreen />;
   }
 
   if (!isCustomer) {

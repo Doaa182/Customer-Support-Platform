@@ -7,6 +7,7 @@ import {
   type Message,
 } from "../../services/messageService";
 import styles from "./RequestDetailsPage.module.css";
+import LoadingSpinner from "../../components/LoadingSpinner/LoadingSpinner";
 
 interface RequestDetails {
   id: string;
@@ -163,7 +164,7 @@ export default function RequestDetailsPage() {
   };
 
   if (loading) {
-    return <p>Loading request...</p>;
+    return <LoadingSpinner message="Loading request..." fullScreen />;
   }
 
   if (error) {
@@ -253,7 +254,7 @@ export default function RequestDetailsPage() {
 
         {messagesLoading && (
           <div className={styles.stateMessage}>
-            <p>Loading conversation...</p>
+            <LoadingSpinner message="Loading conversation..." />
           </div>
         )}
 
