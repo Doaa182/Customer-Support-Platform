@@ -22,33 +22,39 @@
   }
 
   @if (!loading && !error && requests.length > 0) {
-    @for (request of requests; track request.id) {
-      <article>
-        <h3>
-          <a [routerLink]="['/agent/requests', request.id]">
-            {{ request.reference }}
-          </a>
-        </h3>
+    <h2>Support Requests</h2>
 
-        <p>{{ request.description }}</p>
+    <input type="search" [(ngModel)]="searchTerm" placeholder="Search requests..." />
+    @if (filteredRequests.length === 0) {
+      <p>No support requests found.</p>
+    } @else {
+      @for (request of filteredRequests; track request.id) {
+        <article>
+          <h3>
+            <a [routerLink]="['/agent/requests', request.id]">
+              {{ request.reference }}
+            </a>
+          </h3>
 
-        <p>Category: {{ request.category }}</p>
+          <p>{{ request.description }}</p>
 
-        <p>Urgency: {{ request.urgency }}</p>
+          <p>Category: {{ request.category }}</p>
 
-        <p>Status: {{ request.status }}</p>
+          <p>Urgency: {{ request.urgency }}</p>
 
-        <p>
-          Assigned:
-          {{ request.assigned_agent_id ? 'Assigned' : 'Unassigned' }}
-        </p>
+          <p>Status: {{ request.status }}</p>
 
-        @if (!request.assigned_agent_id) {
-          <button type="button" (click)="takeRequest(request.id)">Take Responsibility</button>
-        }
-      </article>
+          <p>
+            Assigned:
+            {{ request.assigned_agent_id ? 'Assigned' : 'Unassigned' }}
+          </p>
 
-      <hr />
+          @if (!request.assigned_agent_id) {
+            <button type="button" (click)="takeRequest(request.id)">Take Responsibility</button>
+          }
+        </article>
+        <hr />
+      }
     }
   }
 </section>

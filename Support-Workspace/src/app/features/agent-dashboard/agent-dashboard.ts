@@ -2,10 +2,11 @@ import { ChangeDetectorRef, Component, inject, OnInit } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
 import { RequestService, SupportRequest } from '../../core/services/request.service';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-agent-dashboard',
-  imports: [RouterLink],
+  imports: [RouterLink, FormsModule],
   templateUrl: './agent-dashboard.html',
   styleUrl: './agent-dashboard.css',
 })
@@ -16,6 +17,8 @@ export class AgentDashboard implements OnInit {
   private cdr = inject(ChangeDetectorRef);
 
   requests: SupportRequest[] = [];
+  searchTerm = '';
+
   loading = true;
   error = '';
 
@@ -50,6 +53,23 @@ export class AgentDashboard implements OnInit {
     }
 
     await this.loadRequests();
+  }
+
+  get filteredRequests(): SupportRequest[] {
+    const term = this.searchTerm.trim().toLowerCase();
+
+    if (!term) {
+      return this.requests;
+    }
+
+    return this.requests.filter(
+      (request) =>
+        request.reference.toLowerCase().includes(term) ||
+        request.description.toLowerCase().includes(term) ||
+        request.category.toLowerCase().includes(term) ||
+        request.urgency.toLowerCase().includes(term) ||
+        request.status.toLowerCase().includes(term),
+    );
   }
 
   async signOut(): Promise<void> {
