@@ -1,9 +1,10 @@
 import { ChangeDetectorRef, Component, inject, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
-import { RequestService, SupportRequest } from '../../core/services/request.service';
+import { SupportRequest } from '../../core/services/request.service';
 import { supabase } from '../../core/supabase';
 import { FormsModule } from '@angular/forms';
+import { AppHeader } from '../../components/app-header/app-header';
 
 interface Message {
   id: string;
@@ -16,7 +17,7 @@ interface Message {
 
 @Component({
   selector: 'app-agent-request-details',
-  imports: [FormsModule],
+  imports: [FormsModule, AppHeader],
   templateUrl: './agent-request-details.html',
   styleUrl: './agent-request-details.css',
 })
@@ -24,7 +25,6 @@ export class AgentRequestDetails implements OnInit {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private authService = inject(AuthService);
-  private requestService = inject(RequestService);
   private cdr = inject(ChangeDetectorRef);
 
   request: SupportRequest | null = null;
@@ -212,11 +212,6 @@ export class AgentRequestDetails implements OnInit {
       this.resolving = false;
       this.cdr.detectChanges();
     }
-  }
-
-  async signOut(): Promise<void> {
-    await this.authService.signOut();
-    await this.router.navigate(['/login']);
   }
 
   goBack(): void {

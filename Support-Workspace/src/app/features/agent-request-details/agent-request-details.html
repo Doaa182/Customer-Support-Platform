@@ -1,82 +1,150 @@
-<section>
-  <button type="button" (click)="goBack()">← Back to Requests</button>
-
-  <button type="button" (click)="signOut()">Sign Out</button>
+<main class="request-details">
+  <app-header role="Agent" />
 
   @if (loading) {
-    <p>Loading request...</p>
+    <div class="state-message">
+      <p>Loading request...</p>
+    </div>
   } @else if (error) {
-    <p>{{ error }}</p>
+    <div class="state-message state-message--error" role="alert">
+      <p>{{ error }}</p>
+    </div>
   } @else if (request) {
-    <h1>{{ request.reference }}</h1>
+    <header class="request-header">
+      <div>
+        <button type="button" class="back-button" (click)="goBack()">← Back to Requests</button>
 
-    <p>{{ request.description }}</p>
+        <p class="request-eyebrow">Support Request</p>
+        <h1>{{ request.reference }}</h1>
+        <p class="request-description">{{ request.description }}</p>
+      </div>
 
-    <p>Category: {{ request.category }}</p>
+      <div class="request-header__actions">
+        @if (request.status !== 'resolved' && request.status !== 'closed') {
+          <button
+            type="button"
+            class="resolve-button"
+            (click)="resolveRequest()"
+            [disabled]="resolving"
+          >
+            {{ resolving ? 'Resolving...' : 'Resolve Request' }}
+          </button>
+        }
+      </div>
+    </header>
 
-    <p>Urgency: {{ request.urgency }}</p>
+    <section class="request-meta" aria-label="Request details">
+      <dl>
+        <div>
+          <dt>Category</dt>
+          <dd>{{ request.category }}</dd>
+        </div>
 
-    <p>Status: {{ request.status }}</p>
+        <div>
+          <dt>Urgency</dt>
+          <dd>{{ request.urgency }}</dd>
+        </div>
 
-    @if (request.status !== 'resolved' && request.status !== 'closed') {
-      <button type="button" (click)="resolveRequest()" [disabled]="resolving">
-        {{ resolving ? 'Resolving...' : 'Resolve Request' }}
-      </button>
-    }
+        <div>
+          <dt>Status</dt>
+          <dd>{{ request.status }}</dd>
+        </div>
 
-    <p>
-      Assigned:
-      {{ request.assigned_agent_id ? 'Assigned' : 'Unassigned' }}
-    </p>
+        <div>
+          <dt>Assignment</dt>
+          <dd>{{ request.assigned_agent_id ? 'Assigned' : 'Unassigned' }}</dd>
+        </div>
+      </dl>
+    </section>
 
-    <hr />
+    <section class="conversation-section" aria-labelledby="conversation-heading">
+      <header class="section-header">
+        <div>
+          <h2 id="conversation-heading">Conversation</h2>
+          <p>Messages between the customer and support team.</p>
+        </div>
+      </header>
 
-    <h2>Conversation</h2>
+      @if (messages.length === 0) {
+        <div class="state-message">
+          <p>No messages yet.</p>
+        </div>
+      } @else {
+        <div class="messages-list">
+          @for (message of messages; track message.id) {
+            <article
+              class="message-card"
+              [class.message-card--internal]="message.type === 'internal'"
+            >
+              <header class="message-card__header">
+                <strong>
+                  {{ message.type === 'internal' ? 'Internal Note' : 'Agent/Client Conversation' }}
+                </strong>
 
-    @if (messages.length === 0) {
-      <p>No messages yet.</p>
-    } @else {
-      @for (message of messages; track message.id) {
-        <article>
-          <strong>
-            {{ message.type === 'internal' ? 'Internal Note' : 'Agent/Client Conversation' }}
-          </strong>
+                <small>{{ message.created_at }}</small>
+              </header>
 
-          <p>{{ message.content }}</p>
-
-          <small>{{ message.created_at }}</small>
-        </article>
+              <p>{{ message.content }}</p>
+            </article>
+          }
+        </div>
       }
-    }
+    </section>
+
+    <section class="message-form-section" aria-labelledby="internal-note-heading">
+      <header class="section-header">
+        <h2 id="internal-note-heading">Internal Note</h2>
+      </header>
+
+      <form class="message-form">
+        <label for="internal-note">Add Internal Note</label>
+
+        <textarea
+          id="internal-note"
+          [(ngModel)]="internalNote"
+          name="internalNote"
+          placeholder="Write an internal note..."
+          rows="4"
+        ></textarea>
+
+        <button
+          type="button"
+          (click)="addInternalNote()"
+          [disabled]="savingNote || !internalNote.trim()"
+        >
+          {{ savingNote ? 'Saving...' : 'Add Internal Note' }}
+        </button>
+      </form>
+
+      @if (error) {
+        <p class="form-error" role="alert">{{ error }}</p>
+      }
+    </section>
+
+    <section class="message-form-section" aria-labelledby="reply-heading">
+      <header class="section-header">
+        <h2 id="reply-heading">Reply to Customer</h2>
+      </header>
+
+      <form class="message-form">
+        <label for="customer-message">Send Message</label>
+
+        <textarea
+          id="customer-message"
+          [(ngModel)]="agentMessage"
+          name="agentMessage"
+          placeholder="Write a message to the customer..."
+          rows="4"
+        ></textarea>
+
+        <button
+          type="button"
+          (click)="sendCustomerMessage()"
+          [disabled]="sendingMessage || !agentMessage.trim()"
+        >
+          {{ sendingMessage ? 'Sending...' : 'Send Message' }}
+        </button>
+      </form>
+    </section>
   }
-  <hr />
-
-  <h2>Internal Note</h2>
-
-  <textarea [(ngModel)]="internalNote" placeholder="Write an internal note..." rows="4"></textarea>
-
-  <button type="button" (click)="addInternalNote()" [disabled]="savingNote || !internalNote.trim()">
-    {{ savingNote ? 'Saving...' : 'Add Internal Note' }}
-  </button>
-
-  @if (error) {
-    <p>{{ error }}</p>
-  }
-  <hr />
-
-  <h2>Reply to Customer</h2>
-
-  <textarea
-    [(ngModel)]="agentMessage"
-    placeholder="Write a message to the customer..."
-    rows="4"
-  ></textarea>
-
-  <button
-    type="button"
-    (click)="sendCustomerMessage()"
-    [disabled]="sendingMessage || !agentMessage.trim()"
-  >
-    {{ sendingMessage ? 'Sending...' : 'Send Message' }}
-  </button>
-</section>
+</main>

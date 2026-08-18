@@ -1,9 +1,8 @@
 import { ChangeDetectorRef, Component, inject, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { AuthService } from '../../core/services/auth.service';
 import { RequestService, SupportRequest } from '../../core/services/request.service';
 import { supabase } from '../../core/supabase';
+import { AppHeader } from '../../components/app-header/app-header';
 
 interface Agent {
   id: string;
@@ -13,13 +12,11 @@ interface Agent {
 
 @Component({
   selector: 'app-manager-dashboard',
-  imports: [FormsModule],
+  imports: [FormsModule, AppHeader],
   templateUrl: './manager-dashboard.html',
   styleUrl: './manager-dashboard.css',
 })
 export class ManagerDashboard implements OnInit {
-  private authService = inject(AuthService);
-  private router = inject(Router);
   private requestService = inject(RequestService);
   private cdr = inject(ChangeDetectorRef);
 
@@ -101,10 +98,5 @@ export class ManagerDashboard implements OnInit {
     this.reassigningRequestId = null;
 
     this.cdr.detectChanges();
-  }
-
-  async signOut(): Promise<void> {
-    await this.authService.signOut();
-    await this.router.navigate(['/login']);
   }
 }

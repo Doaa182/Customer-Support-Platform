@@ -1,71 +1,122 @@
-<section>
-  <h1>Manager Dashboard</h1>
+<main class="dashboard">
+  <app-header role="Manager" />
 
-  <p>Welcome, Manager!</p>
+  <section class="requests-section" aria-labelledby="requests-heading">
+    <header class="section-header">
+      <div>
+        <h2 id="requests-heading">Support Requests</h2>
+        <p>Monitor requests and assign them to support agents.</p>
+      </div>
+    </header>
 
-  <button type="button" (click)="signOut()">Sign Out</button>
+    @if (loading) {
+      <div class="state-message">
+        <p>Loading requests...</p>
+      </div>
+    } @else if (error) {
+      <div class="state-message state-message--error" role="alert">
+        <p>{{ error }}</p>
+      </div>
+    } @else if (requests.length === 0) {
+      <div class="state-message">
+        <p>No support requests found.</p>
+      </div>
+    } @else {
+      <div class="requests-list">
+        @for (request of requests; track request.id) {
+          <article class="request-card">
+            <header class="request-card__header">
+              <h3>{{ request.reference }}</h3>
+            </header>
 
-  <hr />
+            <p class="request-card__description">
+              {{ request.description }}
+            </p>
 
-  <h2>Support Requests</h2>
+            <dl class="request-card__details">
+              <div>
+                <dt>Category</dt>
+                <dd>{{ request.category }}</dd>
+              </div>
 
-  @if (loading) {
-    <p>Loading requests...</p>
-  } @else if (error) {
-    <p>{{ error }}</p>
-  } @else if (requests.length === 0) {
-    <p>No support requests found.</p>
-  } @else {
-    @for (request of requests; track request.id) {
-      <article>
-        <h3>{{ request.reference }}</h3>
+              <div>
+                <dt>Urgency</dt>
+                <dd>{{ request.urgency }}</dd>
+              </div>
 
-        <p>{{ request.description }}</p>
+              <div>
+                <dt>Status</dt>
+                <dd>{{ request.status }}</dd>
+              </div>
 
-        <p>Category: {{ request.category }}</p>
+              <div>
+                <dt>Assignment</dt>
+                <dd>
+                  {{ request.assigned_agent_id ? 'Assigned' : 'Unassigned' }}
+                </dd>
+              </div>
+            </dl>
 
-        <p>Urgency: {{ request.urgency }}</p>
+            <footer class="request-card__footer">
+              <div class="assignment-field">
+                <label [for]="'agent-' + request.id">Assign agent</label>
 
-        <p>Status: {{ request.status }}</p>
+                <select
+                  [id]="'agent-' + request.id"
+                  [(ngModel)]="selectedAgentId[request.id]"
+                  [disabled]="reassigningRequestId === request.id"
+                >
+                  <option value="">Select agent</option>
 
-        <p>
-          Assigned:
-          {{ request.assigned_agent_id ? 'Assigned' : 'Unassigned' }}
-        </p>
+                  @for (agent of agents; track agent.id) {
+                    <option [value]="agent.id">
+                      {{ agent.name }}
+                    </option>
+                  }
+                </select>
+              </div>
 
-        <select
-          [(ngModel)]="selectedAgentId[request.id]"
-          [disabled]="reassigningRequestId === request.id"
-        >
-          <option value="">Select agent</option>
-
-          @for (agent of agents; track agent.id) {
-            <option [value]="agent.id">
-              {{ agent.name }}
-            </option>
-          }
-        </select>
-
-        <button
-          type="button"
-          (click)="reassignRequest(request.id)"
-          [disabled]="!selectedAgentId[request.id] || reassigningRequestId === request.id"
-        >
-          {{ reassigningRequestId === request.id ? 'Reassigning...' : 'Assign / Reassign' }}
-        </button>
-
-        <hr />
-      </article>
+              <button
+                type="button"
+                (click)="reassignRequest(request.id)"
+                [disabled]="!selectedAgentId[request.id] || reassigningRequestId === request.id"
+              >
+                {{ reassigningRequestId === request.id ? 'Reassigning...' : 'Assign / Reassign' }}
+              </button>
+            </footer>
+          </article>
+        }
+      </div>
     }
-  }
+  </section>
 
-  <h2>Agents</h2>
+  <section class="agents-section" aria-labelledby="agents-heading">
+    <header class="section-header">
+      <div>
+        <h2 id="agents-heading">Support Agents</h2>
+        <p>Agents available for request assignment.</p>
+      </div>
+    </header>
 
-  @if (agents.length === 0) {
-    <p>No agents found.</p>
-  } @else {
-    @for (agent of agents; track agent.id) {
-      <p>{{ agent.name }} — {{ agent.id }}</p>
+    @if (agents.length === 0) {
+      <div class="state-message">
+        <p>No agents found.</p>
+      </div>
+    } @else {
+      <div class="agents-list">
+        @for (agent of agents; track agent.id) {
+          <article class="agent-card">
+            <div class="agent-card__avatar">
+              {{ agent.name.charAt(0).toUpperCase() }}
+            </div>
+
+            <div class="agent-card__content">
+              <h3>{{ agent.name }}</h3>
+              <p>Support Agent</p>
+            </div>
+          </article>
+        }
+      </div>
     }
-  }
-</section>
+  </section>
+</main>
