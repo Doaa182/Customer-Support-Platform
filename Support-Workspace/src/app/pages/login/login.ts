@@ -37,6 +37,12 @@ export class Login {
       await this.router.navigate(['/agent']);
     } else if (role === 'manager') {
       await this.router.navigate(['/manager']);
+    } else {
+      this.authService.setError(
+        'Access denied. This workspace is only available to agents and managers.',
+      );
+
+      await this.authService.signOut();
     }
   }
 }

@@ -92,4 +92,8 @@ export class AuthService {
     this.user.set(null);
     this.profile.set(null);
   }
+
+  setError(message: string): void {
+    this.error.set(message);
+  }
 }
