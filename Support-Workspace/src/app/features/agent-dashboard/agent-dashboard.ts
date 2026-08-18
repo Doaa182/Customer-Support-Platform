@@ -1,11 +1,11 @@
-import { Component, inject, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
+import { ChangeDetectorRef, Component, inject, OnInit } from '@angular/core';
+import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
 import { RequestService, SupportRequest } from '../../core/services/request.service';
 
 @Component({
   selector: 'app-agent-dashboard',
-  imports: [],
+  imports: [RouterLink],
   templateUrl: './agent-dashboard.html',
   styleUrl: './agent-dashboard.css',
 })
@@ -13,6 +13,7 @@ export class AgentDashboard implements OnInit {
   private authService = inject(AuthService);
   private router = inject(Router);
   private requestService = inject(RequestService);
+  private cdr = inject(ChangeDetectorRef);
 
   requests: SupportRequest[] = [];
   loading = true;
@@ -36,6 +37,8 @@ export class AgentDashboard implements OnInit {
 
     this.requests = result.data ?? [];
     this.loading = false;
+
+    this.cdr.detectChanges();
   }
 
   async takeRequest(requestId: string): Promise<void> {

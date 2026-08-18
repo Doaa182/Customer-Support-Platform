@@ -24,7 +24,11 @@
   @if (!loading && !error && requests.length > 0) {
     @for (request of requests; track request.id) {
       <article>
-        <h3>{{ request.reference }}</h3>
+        <h3>
+          <a [routerLink]="['/agent/requests', request.id]">
+            {{ request.reference }}
+          </a>
+        </h3>
 
         <p>{{ request.description }}</p>
 

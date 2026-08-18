@@ -1,0 +1,41 @@
+<section>
+  <button type="button" (click)="goBack()">← Back to Requests</button>
+
+  <button type="button" (click)="signOut()">Sign Out</button>
+
+  @if (loading) {
+    <p>Loading request...</p>
+  } @else if (error) {
+    <p>{{ error }}</p>
+  } @else if (request) {
+    <h1>{{ request.reference }}</h1>
+
+    <p>{{ request.description }}</p>
+
+    <p>Category: {{ request.category }}</p>
+
+    <p>Urgency: {{ request.urgency }}</p>
+
+    <p>Status: {{ request.status }}</p>
+
+    <p>
+      Assigned:
+      {{ request.assigned_agent_id ? 'Assigned' : 'Unassigned' }}
+    </p>
+
+    <hr />
+
+    <h2>Customer Conversation</h2>
+
+    @if (messages.length === 0) {
+      <p>No customer messages yet.</p>
+    } @else {
+      @for (message of messages; track message.id) {
+        <article>
+          <p>{{ message.content }}</p>
+          <small>{{ message.created_at }}</small>
+        </article>
+      }
+    }
+  }
+</section>

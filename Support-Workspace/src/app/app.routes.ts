@@ -15,6 +15,14 @@ export const routes: Routes = [
     canActivate: [agentGuard],
   },
   {
+    path: 'agent/requests/:id',
+    loadComponent: () =>
+      import('./features/agent-request-details/agent-request-details').then(
+        (m) => m.AgentRequestDetails,
+      ),
+    canActivate: [agentGuard],
+  },
+  {
     path: 'manager',
     component: ManagerDashboard,
     canActivate: [managerGuard],
