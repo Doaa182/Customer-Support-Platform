@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import Signup from "../components/auth/Signup";
+import Signup from "../components/auth/Signup/Signup";
 
 export default function SignupPage() {
   const navigate = useNavigate();
