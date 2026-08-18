@@ -17,7 +17,9 @@ export class AgentDashboard implements OnInit {
   private cdr = inject(ChangeDetectorRef);
 
   requests: SupportRequest[] = [];
+
   searchTerm = '';
+  sortBy = 'newest';
 
   statusFilter = '';
   urgencyFilter = '';
@@ -63,7 +65,7 @@ export class AgentDashboard implements OnInit {
   get filteredRequests(): SupportRequest[] {
     const term = this.searchTerm.trim().toLowerCase();
 
-    return this.requests.filter((request) => {
+    const filtered = this.requests.filter((request) => {
       const matchesSearch =
         !term ||
         request.reference.toLowerCase().includes(term) ||
@@ -87,6 +89,39 @@ export class AgentDashboard implements OnInit {
         matchesSearch && matchesStatus && matchesUrgency && matchesCategory && matchesAssignment
       );
     });
+
+    return [...filtered].sort((a, b) => {
+      switch (this.sortBy) {
+        case 'oldest':
+          return new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
+
+        case 'recently_updated':
+          return new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime();
+
+        case 'urgency_high':
+          return this.getUrgencyPriority(b.urgency) - this.getUrgencyPriority(a.urgency);
+
+        case 'urgency_low':
+          return this.getUrgencyPriority(a.urgency) - this.getUrgencyPriority(b.urgency);
+
+        case 'newest':
+        default:
+          return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+      }
+    });
+  }
+
+  private getUrgencyPriority(urgency: string): number {
+    switch (urgency) {
+      case 'high':
+        return 3;
+      case 'medium':
+        return 2;
+      case 'low':
+        return 1;
+      default:
+        return 0;
+    }
   }
 
   async signOut(): Promise<void> {

@@ -68,6 +68,18 @@
       </select>
     </div>
 
+    <div>
+      <label for="sort">Sort by</label>
+
+      <select id="sort" [(ngModel)]="sortBy">
+        <option value="newest">Newest</option>
+        <option value="oldest">Oldest</option>
+        <option value="recently_updated">Recently Updated</option>
+        <option value="urgency_high">Highest Urgency</option>
+        <option value="urgency_low">Lowest Urgency</option>
+      </select>
+    </div>
+
     @if (filteredRequests.length === 0) {
       <p>No requests match your search and filters.</p>
     } @else {
