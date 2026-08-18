@@ -39,11 +39,11 @@
   outline-offset: 2px;
 }
 
-.sunIcon {
+.button .fa-sun {
   color: var(--color-warning);
 }
 
-.moonIcon {
+.button .fa-moon {
   color: var(--color-primary);
 }
 

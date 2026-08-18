@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import styles from "./ThemeToggle.module.css";
+import { FaMoon, FaSun } from "react-icons/fa6";
 
 export default function ThemeToggle() {
   const [isDark, setIsDark] = useState(() => {
@@ -23,7 +24,11 @@ export default function ThemeToggle() {
       aria-label={isDark ? "Switch to light mode" : "Switch to dark mode"}
       title={isDark ? "Switch to light mode" : "Switch to dark mode"}
     >
-      {isDark ? "☀️" : "🌙"}
+      {isDark ? (
+        <FaSun className={styles.sunIcon} />
+      ) : (
+        <FaMoon className={styles.moonIcon} />
+      )}
     </button>
   );
 }

@@ -1,0 +1,14 @@
+<button
+  type="button"
+  class="button"
+  (click)="toggleTheme()"
+  [attr.aria-label]="isDark ? 'Switch to light mode' : 'Switch to dark mode'"
+  [attr.title]="isDark ? 'Switch to light mode' : 'Switch to dark mode'"
+>
+  <!-- {{ isDark ? '☀️' : '🌙' }} -->
+  @if (isDark) {
+    <i class="fa-solid fa-sun"></i>
+  } @else {
+    <i class="fa-solid fa-moon"></i>
+  }
+</button>
