@@ -92,105 +92,129 @@ export class AgentRequestDetails implements OnInit {
   async addInternalNote(): Promise<void> {
     const content = this.internalNote.trim();
 
-    if (!content || !this.request) {
+    if (!content || !this.request || this.savingNote) {
       return;
     }
 
     this.savingNote = true;
     this.error = '';
 
-    const user = this.authService.user();
+    try {
+      const user = this.authService.user();
 
-    if (!user) {
-      this.error = 'You must be signed in.';
+      if (!user) {
+        this.error = 'You must be signed in.';
+        return;
+      }
+
+      const { error } = await supabase.from('messages').insert({
+        request_id: this.request.id,
+        author_id: user.id,
+        content,
+        type: 'internal',
+      });
+
+      if (error) {
+        this.error = error.message;
+        return;
+      }
+
+      this.internalNote = '';
+
+      await this.loadRequest(this.request.id);
+    } catch (error) {
+      this.error = error instanceof Error ? error.message : 'Failed to add internal note.';
+    } finally {
       this.savingNote = false;
-      return;
+      this.cdr.detectChanges();
     }
-
-    const { error } = await supabase.from('messages').insert({
-      request_id: this.request.id,
-      author_id: user.id,
-      content,
-      type: 'internal',
-    });
-
-    if (error) {
-      this.error = error.message;
-      this.savingNote = false;
-      return;
-    }
-
-    this.internalNote = '';
-    await this.loadRequest(this.request.id);
-    this.savingNote = false;
-
-    this.cdr.detectChanges();
   }
 
   async sendCustomerMessage(): Promise<void> {
     const content = this.agentMessage.trim();
 
-    if (!content || !this.request) {
+    if (!content || !this.request || this.sendingMessage) {
       return;
     }
 
     this.sendingMessage = true;
     this.error = '';
 
-    const user = this.authService.user();
+    try {
+      const user = this.authService.user();
 
-    if (!user) {
-      this.error = 'You must be signed in.';
+      if (!user) {
+        this.error = 'You must be signed in.';
+        return;
+      }
+
+      const { error } = await supabase.from('messages').insert({
+        request_id: this.request.id,
+        author_id: user.id,
+        content,
+        type: 'customer',
+      });
+
+      if (error) {
+        this.error = error.message;
+        return;
+      }
+
+      this.agentMessage = '';
+
+      await this.loadRequest(this.request.id);
+    } catch (error) {
+      this.error = error instanceof Error ? error.message : 'Failed to send message.';
+    } finally {
       this.sendingMessage = false;
-      return;
+      this.cdr.detectChanges();
     }
-
-    const { error } = await supabase.from('messages').insert({
-      request_id: this.request.id,
-      author_id: user.id,
-      content,
-      type: 'customer',
-    });
-
-    if (error) {
-      this.error = error.message;
-      this.sendingMessage = false;
-      return;
-    }
-
-    this.agentMessage = '';
-
-    await this.loadRequest(this.request.id);
-
-    this.sendingMessage = false;
   }
 
   async resolveRequest(): Promise<void> {
-    if (!this.request) {
+    if (!this.request || this.resolving) {
       return;
     }
 
     this.resolving = true;
     this.error = '';
 
-    const { error } = await supabase
-      .from('requests')
-      .update({
-        status: 'resolved',
-        resolved_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-      })
-      .eq('id', this.request.id);
-      
-    if (error) {
-      this.error = error.message;
-      this.resolving = false;
-      return;
-    }
+    try {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
 
-    await this.loadRequest(this.request.id);
-   
-    this.resolving = false;
+      console.log('Current authenticated user:', user?.id);
+      console.log('Request assigned agent:', this.request.assigned_agent_id);
+
+      const { data, error } = await supabase
+        .from('requests')
+        .update({
+          status: 'resolved',
+          resolved_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', this.request.id)
+        .select()
+        .maybeSingle();
+
+      if (error) {
+        this.error = error.message;
+        return;
+      }
+
+      if (!data) {
+        this.error = 'You are not allowed to resolve this request.';
+        return;
+      }
+
+      this.request = data;
+    } catch (error) {
+      this.error = error instanceof Error ? error.message : 'Failed to resolve request.';
+    } finally {
+      this.resolving = false;
+      this.cdr.detectChanges();
+    }
   }
 
   async signOut(): Promise<void> {
