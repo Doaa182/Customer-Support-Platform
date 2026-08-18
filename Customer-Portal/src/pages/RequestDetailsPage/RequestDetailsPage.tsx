@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
-import { supabase } from "../lib/supabase";
+import { supabase } from "../../lib/supabase";
 import {
   createCustomerMessage,
   getRequestMessages,
   type Message,
-} from "../services/messageService";
+} from "../../services/messageService";
+import styles from "./RequestDetailsPage.module.css";
 
 interface RequestDetails {
   id: string;
@@ -185,74 +186,150 @@ export default function RequestDetailsPage() {
   }
 
   return (
-    <section>
-      <Link to="/requests">← Back to Requests</Link>
+    <main className={styles.requestDetails}>
+      <Link className={styles.backLink} to="/requests">
+        ← Back to Requests
+      </Link>
 
-      <h1>{request.reference}</h1>
-
-      <p>{request.description}</p>
-
-      <p>Category: {request.category}</p>
-
-      <p>Urgency: {request.urgency}</p>
-
-      <p>Status: {getCustomerStatusLabel(request.status)}</p>
-
-      <p>Created: {request.created_at}</p>
-
-      <p>Last updated: {request.updated_at}</p>
-
-      {request.resolved_at && <p>Resolved: {request.resolved_at}</p>}
-
-      <hr />
-
-      <h2>Conversation</h2>
-
-      {messagesLoading && <p>Loading conversation...</p>}
-
-      {messagesError && <p>{messagesError}</p>}
-
-      {!messagesLoading && !messagesError && messages.length === 0 && (
-        <p>No messages yet.</p>
-      )}
-
-      {!messagesLoading && !messagesError && messages.length > 0 && (
+      <header className={styles.requestHeader}>
         <div>
-          {messages.map((message) => (
-            <article key={message.id}>
-              <p>{message.content}</p>
-              <small>{message.created_at}</small>
-            </article>
-          ))}
-        </div>
-      )}
+          <p className={styles.eyebrow}>Support Request</p>
 
-      <h2>Add Information</h2>
+          <h1>{request.reference}</h1>
 
-      <form onSubmit={handleSendMessage}>
-        <div>
-          <label htmlFor="message">Message</label>
-
-          <textarea
-            id="message"
-            value={messageContent}
-            onChange={(event) => setMessageContent(event.target.value)}
-            placeholder="Add more information about your request..."
-            required
-          />
+          <p className={styles.description}>{request.description}</p>
         </div>
 
-        {sendMessageError && <p>{sendMessageError}</p>}
+        <span className={styles.status}>
+          {getCustomerStatusLabel(request.status)}
+        </span>
+      </header>
 
-        {sendMessageSuccess && <p>{sendMessageSuccess}</p>}
+      <section className={styles.requestMeta} aria-label="Request details">
+        <dl>
+          <div>
+            <dt>Category</dt>
+            <dd>{request.category}</dd>
+          </div>
 
-        <button
-          type="submit"
-          disabled={sendingMessage || !messageContent.trim()}
-        >
-          {sendingMessage ? "Sending..." : "Send Message"}
-        </button>
-      </form>
-    </section>
+          <div>
+            <dt>Urgency</dt>
+            <dd>{request.urgency}</dd>
+          </div>
+
+          <div>
+            <dt>Status</dt>
+            <dd>{getCustomerStatusLabel(request.status)}</dd>
+          </div>
+
+          <div>
+            <dt>Created</dt>
+            <dd>{new Date(request.created_at).toLocaleString()}</dd>
+          </div>
+
+          <div>
+            <dt>Last Updated</dt>
+            <dd>{new Date(request.updated_at).toLocaleString()}</dd>
+          </div>
+
+          {request.resolved_at && (
+            <div>
+              <dt>Resolved</dt>
+              <dd>{new Date(request.resolved_at).toLocaleString()}</dd>
+            </div>
+          )}
+        </dl>
+      </section>
+
+      <section
+        className={styles.conversationSection}
+        aria-labelledby="conversation-heading"
+      >
+        <header className={styles.sectionHeader}>
+          <h2 id="conversation-heading">Conversation</h2>
+
+          <p>Messages about your support request.</p>
+        </header>
+
+        {messagesLoading && (
+          <div className={styles.stateMessage}>
+            <p>Loading conversation...</p>
+          </div>
+        )}
+
+        {messagesError && (
+          <div
+            className={`${styles.stateMessage} ${styles.error}`}
+            role="alert"
+          >
+            <p>{messagesError}</p>
+          </div>
+        )}
+
+        {!messagesLoading && !messagesError && messages.length === 0 && (
+          <div className={styles.stateMessage}>
+            <p>No messages yet.</p>
+          </div>
+        )}
+
+        {!messagesLoading && !messagesError && messages.length > 0 && (
+          <div className={styles.messagesList}>
+            {messages.map((message) => (
+              <article className={styles.messageCard} key={message.id}>
+                <p>{message.content}</p>
+
+                <small>{new Date(message.created_at).toLocaleString()}</small>
+              </article>
+            ))}
+          </div>
+        )}
+      </section>
+
+      <section
+        className={styles.messageSection}
+        aria-labelledby="add-information-heading"
+      >
+        <header className={styles.sectionHeader}>
+          <h2 id="add-information-heading">Add Information</h2>
+
+          <p>Send additional information to the support team.</p>
+        </header>
+
+        <form className={styles.messageForm} onSubmit={handleSendMessage}>
+          <div className={styles.field}>
+            <label htmlFor="message">Message</label>
+
+            <textarea
+              id="message"
+              value={messageContent}
+              onChange={(event) => setMessageContent(event.target.value)}
+              placeholder="Add more information about your request..."
+              rows={5}
+              required
+            />
+          </div>
+
+          {sendMessageError && (
+            <p className={styles.errorMessage} role="alert">
+              {sendMessageError}
+            </p>
+          )}
+
+          {sendMessageSuccess && (
+            <p className={styles.successMessage} role="status">
+              {sendMessageSuccess}
+            </p>
+          )}
+
+          <button
+            className={styles.sendButton}
+            type="submit"
+            disabled={sendingMessage || !messageContent.trim()}
+          >
+            {sendingMessage ? "Sending..." : "Send Message"}
+          </button>
+        </form>
+      </section>
+    </main>
   );
 }
