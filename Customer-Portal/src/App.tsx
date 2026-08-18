@@ -12,7 +12,7 @@ import LoginPage from "./pages/LoginPage";
 import SignupPage from "./pages/SignupPage";
 import RequestsPage from "./pages/RequestsPage/RequestsPage";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
-import CreateRequestPage from "./pages/CreateRequestPage";
+import CreateRequestPage from "./pages/CreateRequestPage/CreateRequestPage";
 import RequestDetailsPage from "./pages/RequestDetailsPage/RequestDetailsPage";
 
 export default function App() {
