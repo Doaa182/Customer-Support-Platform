@@ -3,6 +3,7 @@ import { FormsModule } from '@angular/forms';
 import { RequestService, SupportRequest } from '../../core/services/request.service';
 import { supabase } from '../../core/supabase';
 import { AppHeader } from '../../components/app-header/app-header';
+import { LoadingSpinner } from '../../components/loading-spinner/loading-spinner';
 
 interface Agent {
   id: string;
@@ -12,7 +13,7 @@ interface Agent {
 
 @Component({
   selector: 'app-manager-dashboard',
-  imports: [FormsModule, AppHeader],
+  imports: [FormsModule, AppHeader, LoadingSpinner],
   templateUrl: './manager-dashboard.html',
   styleUrl: './manager-dashboard.css',
 })

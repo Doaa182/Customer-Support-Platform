@@ -3,10 +3,11 @@ import { RouterLink } from '@angular/router';
 import { RequestService, SupportRequest } from '../../core/services/request.service';
 import { FormsModule } from '@angular/forms';
 import { AppHeader } from '../../components/app-header/app-header';
+import { LoadingSpinner } from '../../components/loading-spinner/loading-spinner';
 
 @Component({
   selector: 'app-agent-dashboard',
-  imports: [RouterLink, FormsModule, AppHeader],
+  imports: [RouterLink, FormsModule, AppHeader, LoadingSpinner],
   templateUrl: './agent-dashboard.html',
   styleUrl: './agent-dashboard.css',
 })

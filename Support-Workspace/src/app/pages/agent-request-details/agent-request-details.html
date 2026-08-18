@@ -3,7 +3,7 @@
 
   @if (loading) {
     <div class="state-message">
-      <p>Loading request...</p>
+      <app-loading-spinner message="Loading request..." />
     </div>
   } @else if (error) {
     <div class="state-message state-message--error" role="alert">

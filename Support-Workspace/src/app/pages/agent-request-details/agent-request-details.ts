@@ -5,6 +5,7 @@ import { SupportRequest } from '../../core/services/request.service';
 import { supabase } from '../../core/supabase';
 import { FormsModule } from '@angular/forms';
 import { AppHeader } from '../../components/app-header/app-header';
+import { LoadingSpinner } from '../../components/loading-spinner/loading-spinner';
 
 interface Message {
   id: string;
@@ -17,7 +18,7 @@ interface Message {
 
 @Component({
   selector: 'app-agent-request-details',
-  imports: [FormsModule, AppHeader],
+  imports: [FormsModule, AppHeader, LoadingSpinner],
   templateUrl: './agent-request-details.html',
   styleUrl: './agent-request-details.css',
 })
