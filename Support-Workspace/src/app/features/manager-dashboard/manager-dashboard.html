@@ -33,6 +33,27 @@
           {{ request.assigned_agent_id ? 'Assigned' : 'Unassigned' }}
         </p>
 
+        <select
+          [(ngModel)]="selectedAgentId[request.id]"
+          [disabled]="reassigningRequestId === request.id"
+        >
+          <option value="">Select agent</option>
+
+          @for (agent of agents; track agent.id) {
+            <option [value]="agent.id">
+              {{ agent.name }}
+            </option>
+          }
+        </select>
+
+        <button
+          type="button"
+          (click)="reassignRequest(request.id)"
+          [disabled]="!selectedAgentId[request.id] || reassigningRequestId === request.id"
+        >
+          {{ reassigningRequestId === request.id ? 'Reassigning...' : 'Assign / Reassign' }}
+        </button>
+
         <hr />
       </article>
     }
@@ -40,7 +61,11 @@
 
   <h2>Agents</h2>
 
-  @for (agent of agents; track agent.id) {
-    <p>{{ agent.name }} — {{ agent.id }}</p>
+  @if (agents.length === 0) {
+    <p>No agents found.</p>
+  } @else {
+    @for (agent of agents; track agent.id) {
+      <p>{{ agent.name }} — {{ agent.id }}</p>
+    }
   }
 </section>

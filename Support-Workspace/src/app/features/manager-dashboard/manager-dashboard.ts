@@ -1,5 +1,6 @@
 import { ChangeDetectorRef, Component, inject, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
+import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../core/services/auth.service';
 import { RequestService, SupportRequest } from '../../core/services/request.service';
 import { supabase } from '../../core/supabase';
@@ -12,7 +13,7 @@ interface Agent {
 
 @Component({
   selector: 'app-manager-dashboard',
-  imports: [],
+  imports: [FormsModule],
   templateUrl: './manager-dashboard.html',
   styleUrl: './manager-dashboard.css',
 })
@@ -25,15 +26,13 @@ export class ManagerDashboard implements OnInit {
   requests: SupportRequest[] = [];
   agents: Agent[] = [];
 
+  selectedAgentId: Record<string, string> = {};
+  reassigningRequestId: string | null = null;
+
   loading = true;
   error = '';
 
   async ngOnInit(): Promise<void> {
-    const user = this.authService.user();
-
-    console.log('Logged-in user:', user);
-    console.log('Logged-in user ID:', user?.id);
-
     await this.loadRequests();
     await this.loadAgents();
   }
@@ -68,6 +67,38 @@ export class ManagerDashboard implements OnInit {
     }
 
     this.agents = data ?? [];
+
+    this.cdr.detectChanges();
+  }
+
+  async reassignRequest(requestId: string): Promise<void> {
+    const agentId = this.selectedAgentId[requestId];
+
+    if (!agentId) {
+      return;
+    }
+
+    this.reassigningRequestId = requestId;
+    this.error = '';
+
+    const { error } = await supabase
+      .from('requests')
+      .update({
+        assigned_agent_id: agentId,
+        updated_at: new Date().toISOString(),
+      })
+      .eq('id', requestId);
+
+    if (error) {
+      this.error = error.message;
+      this.reassigningRequestId = null;
+      return;
+    }
+
+    await this.loadRequests();
+
+    this.selectedAgentId[requestId] = '';
+    this.reassigningRequestId = null;
 
     this.cdr.detectChanges();
   }
