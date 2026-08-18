@@ -84,7 +84,6 @@ export class AgentRequestDetails implements OnInit {
     }
 
     this.messages = messagesResult.data ?? [];
-    console.log('All messages for this request:', this.messages);
     this.loading = false;
 
     this.cdr.detectChanges();
@@ -183,8 +182,6 @@ export class AgentRequestDetails implements OnInit {
       })
       .eq('id', this.request.id);
       
-    console.log('Resolve result:', { error });
-
     if (error) {
       this.error = error.message;
       this.resolving = false;
@@ -192,8 +189,7 @@ export class AgentRequestDetails implements OnInit {
     }
 
     await this.loadRequest(this.request.id);
-    console.log('Request after resolve:', this.request);
-
+   
     this.resolving = false;
   }
 

@@ -3,7 +3,44 @@
 
   <p>Welcome, Manager!</p>
 
-  <p>Your Manager workspace will appear here.</p>
+  <button type="button" (click)="signOut()">Sign Out</button>
 
-  <button (click)="signOut()">Sign Out</button>
+  <hr />
+
+  <h2>Support Requests</h2>
+
+  @if (loading) {
+    <p>Loading requests...</p>
+  } @else if (error) {
+    <p>{{ error }}</p>
+  } @else if (requests.length === 0) {
+    <p>No support requests found.</p>
+  } @else {
+    @for (request of requests; track request.id) {
+      <article>
+        <h3>{{ request.reference }}</h3>
+
+        <p>{{ request.description }}</p>
+
+        <p>Category: {{ request.category }}</p>
+
+        <p>Urgency: {{ request.urgency }}</p>
+
+        <p>Status: {{ request.status }}</p>
+
+        <p>
+          Assigned:
+          {{ request.assigned_agent_id ? 'Assigned' : 'Unassigned' }}
+        </p>
+
+        <hr />
+      </article>
+    }
+  }
+
+  <h2>Agents</h2>
+
+  @for (agent of agents; track agent.id) {
+    <p>{{ agent.name }} — {{ agent.id }}</p>
+  }
 </section>
