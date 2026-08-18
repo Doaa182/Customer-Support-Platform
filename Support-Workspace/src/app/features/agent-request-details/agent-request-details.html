@@ -25,17 +25,52 @@
 
     <hr />
 
-    <h2>Customer Conversation</h2>
+    <h2>Conversation</h2>
 
     @if (messages.length === 0) {
-      <p>No customer messages yet.</p>
+      <p>No messages yet.</p>
     } @else {
       @for (message of messages; track message.id) {
         <article>
+          <strong>
+            {{ message.type === 'internal' ? 'Internal Note' : 'Customer Message' }}
+          </strong>
+
           <p>{{ message.content }}</p>
+
           <small>{{ message.created_at }}</small>
         </article>
       }
     }
   }
+  <hr />
+
+  <h2>Internal Note</h2>
+
+  <textarea [(ngModel)]="internalNote" placeholder="Write an internal note..." rows="4"></textarea>
+
+  <button type="button" (click)="addInternalNote()" [disabled]="savingNote || !internalNote.trim()">
+    {{ savingNote ? 'Saving...' : 'Add Internal Note' }}
+  </button>
+
+  @if (error) {
+    <p>{{ error }}</p>
+  }
+  <hr />
+
+  <h2>Reply to Customer</h2>
+
+  <textarea
+    [(ngModel)]="agentMessage"
+    placeholder="Write a message to the customer..."
+    rows="4"
+  ></textarea>
+
+  <button
+    type="button"
+    (click)="sendCustomerMessage()"
+    [disabled]="sendingMessage || !agentMessage.trim()"
+  >
+    {{ sendingMessage ? 'Sending...' : 'Send Message' }}
+  </button>
 </section>

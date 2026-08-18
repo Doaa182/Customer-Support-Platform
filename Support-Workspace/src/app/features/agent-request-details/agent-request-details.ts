@@ -3,6 +3,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
 import { RequestService, SupportRequest } from '../../core/services/request.service';
 import { supabase } from '../../core/supabase';
+import { FormsModule } from '@angular/forms';
 
 interface Message {
   id: string;
@@ -15,7 +16,7 @@ interface Message {
 
 @Component({
   selector: 'app-agent-request-details',
-  imports: [],
+  imports: [FormsModule],
   templateUrl: './agent-request-details.html',
   styleUrl: './agent-request-details.css',
 })
@@ -29,8 +30,14 @@ export class AgentRequestDetails implements OnInit {
   request: SupportRequest | null = null;
   messages: Message[] = [];
 
+  internalNote = '';
+
   loading = true;
+  savingNote = false;
   error = '';
+
+  agentMessage = '';
+  sendingMessage = false;
 
   async ngOnInit(): Promise<void> {
     const requestId = this.route.snapshot.paramMap.get('id');
@@ -45,8 +52,6 @@ export class AgentRequestDetails implements OnInit {
   }
 
   private async loadRequest(requestId: string): Promise<void> {
-    console.log('Agent request ID:', requestId);
-
     this.loading = true;
     this.error = '';
 
@@ -55,8 +60,6 @@ export class AgentRequestDetails implements OnInit {
       .select('*')
       .eq('id', requestId)
       .single();
-
-    console.log('Request result:', { data, error });
 
     if (error) {
       this.error = error.message;
@@ -70,10 +73,7 @@ export class AgentRequestDetails implements OnInit {
       .from('messages')
       .select('*')
       .eq('request_id', requestId)
-      .eq('type', 'customer')
       .order('created_at', { ascending: true });
-
-    console.log('Messages result:', messagesResult);
 
     if (messagesResult.error) {
       this.error = messagesResult.error.message;
@@ -82,9 +82,86 @@ export class AgentRequestDetails implements OnInit {
     }
 
     this.messages = messagesResult.data ?? [];
+    console.log('All messages for this request:', this.messages);
     this.loading = false;
 
     this.cdr.detectChanges();
+  }
+
+  async addInternalNote(): Promise<void> {
+    const content = this.internalNote.trim();
+
+    if (!content || !this.request) {
+      return;
+    }
+
+    this.savingNote = true;
+    this.error = '';
+
+    const user = this.authService.user();
+
+    if (!user) {
+      this.error = 'You must be signed in.';
+      this.savingNote = false;
+      return;
+    }
+
+    const { error } = await supabase.from('messages').insert({
+      request_id: this.request.id,
+      author_id: user.id,
+      content,
+      type: 'internal',
+    });
+
+    if (error) {
+      this.error = error.message;
+      this.savingNote = false;
+      return;
+    }
+
+    this.internalNote = '';
+    await this.loadRequest(this.request.id);
+    this.savingNote = false;
+
+    this.cdr.detectChanges();
+  }
+
+  async sendCustomerMessage(): Promise<void> {
+    const content = this.agentMessage.trim();
+
+    if (!content || !this.request) {
+      return;
+    }
+
+    this.sendingMessage = true;
+    this.error = '';
+
+    const user = this.authService.user();
+
+    if (!user) {
+      this.error = 'You must be signed in.';
+      this.sendingMessage = false;
+      return;
+    }
+
+    const { error } = await supabase.from('messages').insert({
+      request_id: this.request.id,
+      author_id: user.id,
+      content,
+      type: 'customer',
+    });
+
+    if (error) {
+      this.error = error.message;
+      this.sendingMessage = false;
+      return;
+    }
+
+    this.agentMessage = '';
+
+    await this.loadRequest(this.request.id);
+
+    this.sendingMessage = false;
   }
 
   async signOut(): Promise<void> {
