@@ -1,13 +1,13 @@
 import { Routes } from '@angular/router';
 import { agentGuard } from './core/guards/agent.guard';
 import { managerGuard } from './core/guards/manager.guard';
-import { ManagerDashboard } from './features/manager-dashboard/manager-dashboard';
-import { AgentDashboard } from './features/agent-dashboard/agent-dashboard';
+import { ManagerDashboard } from './pages/manager-dashboard/manager-dashboard';
+import { AgentDashboard } from './pages/agent-dashboard/agent-dashboard';
 
 export const routes: Routes = [
   {
     path: 'login',
-    loadComponent: () => import('./features/auth/login/login').then((m) => m.Login),
+    loadComponent: () => import('./pages/login/login').then((m) => m.Login),
   },
   {
     path: 'agent',
@@ -17,7 +17,7 @@ export const routes: Routes = [
   {
     path: 'agent/requests/:id',
     loadComponent: () =>
-      import('./features/agent-request-details/agent-request-details').then(
+      import('./pages/agent-request-details/agent-request-details').then(
         (m) => m.AgentRequestDetails,
       ),
     canActivate: [agentGuard],

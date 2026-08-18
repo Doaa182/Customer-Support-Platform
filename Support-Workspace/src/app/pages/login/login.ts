@@ -1,6 +1,6 @@
 import { Component, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { AuthService } from '../../../core/services/auth.service';
+import { AuthService } from '../../core/services/auth.service';
 import { Router } from '@angular/router';
 
 @Component({
@@ -26,10 +26,16 @@ export class Login {
 
   async login(): Promise<void> {
     const success = await this.authService.signIn(this.email, this.password);
-    
-    if (success && this.authService.profile()?.role === 'agent') {
+
+    if (!success) {
+      return;
+    }
+
+    const role = this.authService.profile()?.role;
+
+    if (role === 'agent') {
       await this.router.navigate(['/agent']);
-    } else if (success && this.authService.profile()?.role === 'manager') {
+    } else if (role === 'manager') {
       await this.router.navigate(['/manager']);
     }
   }
