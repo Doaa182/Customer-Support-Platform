@@ -9,7 +9,7 @@ import { AuthService } from '../../core/services/auth.service';
   styleUrl: './app-header.css',
 })
 export class AppHeader {
-  private authService = inject(AuthService);
+  protected authService = inject(AuthService);
   private router = inject(Router);
 
   role = input('Agent');

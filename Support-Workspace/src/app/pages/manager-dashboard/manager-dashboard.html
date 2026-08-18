@@ -52,7 +52,11 @@
               <div>
                 <dt>Assignment</dt>
                 <dd>
-                  {{ request.assigned_agent_id ? 'Assigned' : 'Unassigned' }}
+                  @if (request.assigned_agent_id) {
+                    Assigned to {{ getAssignedAgentName(request.assigned_agent_id) }}
+                  } @else {
+                    Unassigned
+                  }
                 </dd>
               </div>
             </dl>
@@ -66,7 +70,7 @@
                   [(ngModel)]="selectedAgentId[request.id]"
                   [disabled]="reassigningRequestId === request.id"
                 >
-                  <option value="">Select agent</option>
+                  <option value="" disabled>--Select agent--</option>
 
                   @for (agent of agents; track agent.id) {
                     <option [value]="agent.id">

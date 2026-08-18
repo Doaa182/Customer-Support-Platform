@@ -99,4 +99,14 @@ export class ManagerDashboard implements OnInit {
 
     this.cdr.detectChanges();
   }
+
+  getAssignedAgentName(agentId: string | null): string {
+    if (!agentId) {
+      return 'Unassigned';
+    }
+
+    const agent = this.agents.find((agent) => agent.id === agentId);
+
+    return agent?.name ?? 'Unknown agent';
+  }
 }
