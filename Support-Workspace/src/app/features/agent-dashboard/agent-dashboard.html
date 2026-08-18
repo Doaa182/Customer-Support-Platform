@@ -1,115 +1,151 @@
-<section>
-  <h1>Agent Dashboard</h1>
+<main class="dashboard">
+  <app-header role="Agent" />
 
-  <p>Welcome, Agent!</p>
+  <section class="requests-section" aria-labelledby="requests-heading">
+    <header class="section-header">
+      <div>
+        <h2 id="requests-heading">Support Requests</h2>
+        <p>Search, filter, and manage customer support requests.</p>
+      </div>
+    </header>
 
-  <button (click)="signOut()">Sign Out</button>
+    @if (loading) {
+      <div class="state-message">
+        <p>Loading requests...</p>
+      </div>
+    }
 
-  <hr />
+    @if (!loading && error) {
+      <div class="state-message state-message--error" role="alert">
+        <p>{{ error }}</p>
+      </div>
+    }
 
-  <h2>Support Requests</h2>
+    @if (!loading && !error && requests.length === 0) {
+      <div class="state-message">
+        <p>No support requests found.</p>
+      </div>
+    }
 
-  @if (loading) {
-    <p>Loading requests...</p>
-  }
+    @if (!loading && !error && requests.length > 0) {
+      <form class="request-filters">
+        <div class="search-field">
+          <label for="search">Search requests</label>
+          <input
+            id="search"
+            type="search"
+            [(ngModel)]="searchTerm"
+            name="search"
+            placeholder="Search by reference, description..."
+          />
+        </div>
 
-  @if (!loading && error) {
-    <p>{{ error }}</p>
-  }
+        <div class="filter-field">
+          <label for="status">Status</label>
+          <select id="status" [(ngModel)]="statusFilter" name="status">
+            <option value="">All statuses</option>
+            <option value="open">Open</option>
+            <option value="in_progress">In Progress</option>
+            <option value="resolved">Resolved</option>
+          </select>
+        </div>
 
-  @if (!loading && !error && requests.length === 0) {
-    <p>No support requests found.</p>
-  }
+        <div class="filter-field">
+          <label for="urgency">Urgency</label>
+          <select id="urgency" [(ngModel)]="urgencyFilter" name="urgency">
+            <option value="">All urgencies</option>
+            <option value="high">High</option>
+            <option value="medium">Medium</option>
+            <option value="low">Low</option>
+          </select>
+        </div>
 
-  @if (!loading && !error && requests.length > 0) {
-    <h2>Support Requests</h2>
+        <div class="filter-field">
+          <label for="category">Category</label>
+          <select id="category" [(ngModel)]="categoryFilter" name="category">
+            <option value="">All categories</option>
+            <option value="general">General</option>
+            <option value="technical">Technical</option>
+            <option value="billing">Billing</option>
+          </select>
+        </div>
 
-    <input type="search" [(ngModel)]="searchTerm" placeholder="Search requests..." />
-    <div>
-      <label for="status">Status</label>
+        <div class="filter-field">
+          <label for="assignment">Assignment</label>
+          <select id="assignment" [(ngModel)]="assignmentFilter" name="assignment">
+            <option value="">All requests</option>
+            <option value="assigned">Assigned</option>
+            <option value="unassigned">Unassigned</option>
+          </select>
+        </div>
 
-      <select id="status" [(ngModel)]="statusFilter">
-        <option value="">All statuses</option>
-        <option value="open">Open</option>
-        <option value="in_progress">In Progress</option>
-        <option value="resolved">Resolved</option>
-      </select>
-    </div>
+        <div class="filter-field">
+          <label for="sort">Sort by</label>
+          <select id="sort" [(ngModel)]="sortBy" name="sort">
+            <option value="newest">Newest</option>
+            <option value="oldest">Oldest</option>
+            <option value="recently_updated">Recently Updated</option>
+            <option value="urgency_high">Highest Urgency</option>
+            <option value="urgency_low">Lowest Urgency</option>
+          </select>
+        </div>
+      </form>
 
-    <div>
-      <label for="urgency">Urgency</label>
+      @if (filteredRequests.length === 0) {
+        <div class="state-message">
+          <p>No requests match your search and filters.</p>
+        </div>
+      } @else {
+        <div class="requests-list">
+          @for (request of filteredRequests; track request.id) {
+            <article class="request-card">
+              <header class="request-card__header">
+                <h3>
+                  <a [routerLink]="['/agent/requests', request.id]">
+                    {{ request.reference }}
+                  </a>
+                </h3>
+              </header>
 
-      <select id="urgency" [(ngModel)]="urgencyFilter">
-        <option value="">All urgencies</option>
-        <option value="high">High</option>
-        <option value="medium">Medium</option>
-        <option value="low">Low</option>
-      </select>
-    </div>
+              <p class="request-card__description">
+                {{ request.description }}
+              </p>
 
-    <div>
-      <label for="category">Category</label>
+              <dl class="request-card__details">
+                <div>
+                  <dt>Category</dt>
+                  <dd>{{ request.category }}</dd>
+                </div>
 
-      <select id="category" [(ngModel)]="categoryFilter">
-        <option value="">All categories</option>
-        <option value="general">General</option>
-        <option value="technical">Technical</option>
-        <option value="billing">Billing</option>
-      </select>
-    </div>
+                <div>
+                  <dt>Urgency</dt>
+                  <dd>{{ request.urgency }}</dd>
+                </div>
 
-    <div>
-      <label for="assignment">Assignment</label>
+                <div>
+                  <dt>Status</dt>
+                  <dd>{{ request.status }}</dd>
+                </div>
 
-      <select id="assignment" [(ngModel)]="assignmentFilter">
-        <option value="">All requests</option>
-        <option value="assigned">Assigned</option>
-        <option value="unassigned">Unassigned</option>
-      </select>
-    </div>
+                <div>
+                  <dt>Assignment</dt>
+                  <dd>
+                    {{ request.assigned_agent_id ? 'Assigned' : 'Unassigned' }}
+                  </dd>
+                </div>
+              </dl>
 
-    <div>
-      <label for="sort">Sort by</label>
-
-      <select id="sort" [(ngModel)]="sortBy">
-        <option value="newest">Newest</option>
-        <option value="oldest">Oldest</option>
-        <option value="recently_updated">Recently Updated</option>
-        <option value="urgency_high">Highest Urgency</option>
-        <option value="urgency_low">Lowest Urgency</option>
-      </select>
-    </div>
-
-    @if (filteredRequests.length === 0) {
-      <p>No requests match your search and filters.</p>
-    } @else {
-      @for (request of filteredRequests; track request.id) {
-        <article>
-          <h3>
-            <a [routerLink]="['/agent/requests', request.id]">
-              {{ request.reference }}
-            </a>
-          </h3>
-
-          <p>{{ request.description }}</p>
-
-          <p>Category: {{ request.category }}</p>
-
-          <p>Urgency: {{ request.urgency }}</p>
-
-          <p>Status: {{ request.status }}</p>
-
-          <p>
-            Assigned:
-            {{ request.assigned_agent_id ? 'Assigned' : 'Unassigned' }}
-          </p>
-
-          @if (!request.assigned_agent_id) {
-            <button type="button" (click)="takeRequest(request.id)">Take Responsibility</button>
+              @if (!request.assigned_agent_id) {
+                <footer class="request-card__footer">
+                  <button type="button" (click)="takeRequest(request.id)">
+                    Take Responsibility
+                  </button>
+                </footer>
+              }
+            </article>
           }
-        </article>
-        <hr />
+        </div>
       }
     }
-  }
-</section>
+  </section>
+</main>

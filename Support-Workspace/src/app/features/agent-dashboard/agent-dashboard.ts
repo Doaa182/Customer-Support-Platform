@@ -1,18 +1,16 @@
 import { ChangeDetectorRef, Component, inject, OnInit } from '@angular/core';
-import { Router, RouterLink } from '@angular/router';
-import { AuthService } from '../../core/services/auth.service';
+import { RouterLink } from '@angular/router';
 import { RequestService, SupportRequest } from '../../core/services/request.service';
 import { FormsModule } from '@angular/forms';
+import { AppHeader } from '../../components/app-header/app-header';
 
 @Component({
   selector: 'app-agent-dashboard',
-  imports: [RouterLink, FormsModule],
+  imports: [RouterLink, FormsModule, AppHeader],
   templateUrl: './agent-dashboard.html',
   styleUrl: './agent-dashboard.css',
 })
 export class AgentDashboard implements OnInit {
-  private authService = inject(AuthService);
-  private router = inject(Router);
   private requestService = inject(RequestService);
   private cdr = inject(ChangeDetectorRef);
 
@@ -122,10 +120,5 @@ export class AgentDashboard implements OnInit {
       default:
         return 0;
     }
-  }
-
-  async signOut(): Promise<void> {
-    await this.authService.signOut();
-    await this.router.navigate(['/login']);
   }
 }

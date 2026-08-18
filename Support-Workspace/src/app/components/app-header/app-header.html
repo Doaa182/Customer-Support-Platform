@@ -1,0 +1,15 @@
+<header class="app-header">
+  <div class="app-header__content">
+    <p class="app-header__eyebrow">Support Workspace</p>
+
+    <h1>{{ role() }} Dashboard</h1>
+  </div>
+
+  <div class="app-header__actions">
+    <button type="button" (click)="toggleTheme()">
+      {{ darkMode ? '☀️ Light mode' : '🌙 Dark mode' }}
+    </button>
+
+    <button type="button" (click)="signOut()">Sign Out</button>
+  </div>
+</header>

@@ -184,9 +184,6 @@ export class AgentRequestDetails implements OnInit {
         data: { user },
       } = await supabase.auth.getUser();
 
-      console.log('Current authenticated user:', user?.id);
-      console.log('Request assigned agent:', this.request.assigned_agent_id);
-
       const { data, error } = await supabase
         .from('requests')
         .update({
