@@ -16,6 +16,7 @@ import CreateRequestPage from "./pages/CreateRequestPage/CreateRequestPage";
 import RequestDetailsPage from "./pages/RequestDetailsPage/RequestDetailsPage";
 import NotFoundPage from "./pages/NotFoundPage/NotFoundPage";
 import ThemeToggle from "./components/theme-toggle/ThemeToggle";
+import UnauthorizedPage from "./pages/UnauthorizedPage/UnauthorizedPage";
 
 export default function App() {
   const [session, setSession] = useState<Session | null>(null);
@@ -69,6 +70,8 @@ export default function App() {
               session ? <Navigate to="/requests" replace /> : <SignupPage />
             }
           />
+
+          <Route path="/unauthorized" element={<UnauthorizedPage />} />
 
           <Route element={<ProtectedRoute session={session} />}>
             <Route
