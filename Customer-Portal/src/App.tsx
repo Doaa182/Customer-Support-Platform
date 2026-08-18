@@ -15,6 +15,7 @@ import ProtectedRoute from "./components/auth/ProtectedRoute";
 import CreateRequestPage from "./pages/CreateRequestPage/CreateRequestPage";
 import RequestDetailsPage from "./pages/RequestDetailsPage/RequestDetailsPage";
 import NotFoundPage from "./pages/NotFoundPage/NotFoundPage";
+import ThemeToggle from "./components/theme-toggle/ThemeToggle";
 
 export default function App() {
   const [session, setSession] = useState<Session | null>(null);
@@ -46,29 +47,41 @@ export default function App() {
   }
 
   return (
-    <Routes>
-      <Route
-        path="/"
-        element={<Navigate to={session ? "/requests" : "/login"} replace />}
-      />
+    <>
+      <ThemeToggle />
+      <div className="app-content">
+        <Routes>
+          <Route
+            path="/"
+            element={<Navigate to={session ? "/requests" : "/login"} replace />}
+          />
 
-      <Route
-        path="/login"
-        element={session ? <Navigate to="/requests" replace /> : <LoginPage />}
-      />
+          <Route
+            path="/login"
+            element={
+              session ? <Navigate to="/requests" replace /> : <LoginPage />
+            }
+          />
 
-      <Route
-        path="/signup"
-        element={session ? <Navigate to="/requests" replace /> : <SignupPage />}
-      />
+          <Route
+            path="/signup"
+            element={
+              session ? <Navigate to="/requests" replace /> : <SignupPage />
+            }
+          />
 
-      <Route element={<ProtectedRoute session={session} />}>
-        <Route path="/requests" element={<RequestsPage session={session} />} />
-        <Route path="/requests/create" element={<CreateRequestPage />} />
-        <Route path="/requests/:id" element={<RequestDetailsPage />} />
-      </Route>
+          <Route element={<ProtectedRoute session={session} />}>
+            <Route
+              path="/requests"
+              element={<RequestsPage session={session} />}
+            />
+            <Route path="/requests/create" element={<CreateRequestPage />} />
+            <Route path="/requests/:id" element={<RequestDetailsPage />} />
+          </Route>
 
-      <Route path="*" element={<NotFoundPage />} />
-    </Routes>
+          <Route path="*" element={<NotFoundPage />} />
+        </Routes>
+      </div>
+    </>
   );
 }

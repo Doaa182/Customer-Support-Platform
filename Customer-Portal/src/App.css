@@ -1,0 +1,9 @@
+.app-content {
+  padding-top: calc(42px + var(--space-6));
+}
+
+@media (max-width: 480px) {
+  .app-content {
+    padding-top: calc(12px + var(--space-2));
+  }
+}
