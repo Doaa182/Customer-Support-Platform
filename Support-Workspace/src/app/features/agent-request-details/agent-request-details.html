@@ -18,6 +18,12 @@
 
     <p>Status: {{ request.status }}</p>
 
+    @if (request.status !== 'resolved' && request.status !== 'closed') {
+      <button type="button" (click)="resolveRequest()" [disabled]="resolving">
+        {{ resolving ? 'Resolving...' : 'Resolve Request' }}
+      </button>
+    }
+
     <p>
       Assigned:
       {{ request.assigned_agent_id ? 'Assigned' : 'Unassigned' }}
@@ -33,7 +39,7 @@
       @for (message of messages; track message.id) {
         <article>
           <strong>
-            {{ message.type === 'internal' ? 'Internal Note' : 'Customer Message' }}
+            {{ message.type === 'internal' ? 'Internal Note' : 'Agent/Client Conversation' }}
           </strong>
 
           <p>{{ message.content }}</p>

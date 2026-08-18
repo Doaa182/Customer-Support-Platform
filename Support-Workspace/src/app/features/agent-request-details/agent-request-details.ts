@@ -39,6 +39,8 @@ export class AgentRequestDetails implements OnInit {
   agentMessage = '';
   sendingMessage = false;
 
+  resolving = false;
+
   async ngOnInit(): Promise<void> {
     const requestId = this.route.snapshot.paramMap.get('id');
 
@@ -162,6 +164,37 @@ export class AgentRequestDetails implements OnInit {
     await this.loadRequest(this.request.id);
 
     this.sendingMessage = false;
+  }
+
+  async resolveRequest(): Promise<void> {
+    if (!this.request) {
+      return;
+    }
+
+    this.resolving = true;
+    this.error = '';
+
+    const { error } = await supabase
+      .from('requests')
+      .update({
+        status: 'resolved',
+        resolved_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      })
+      .eq('id', this.request.id);
+      
+    console.log('Resolve result:', { error });
+
+    if (error) {
+      this.error = error.message;
+      this.resolving = false;
+      return;
+    }
+
+    await this.loadRequest(this.request.id);
+    console.log('Request after resolve:', this.request);
+
+    this.resolving = false;
   }
 
   async signOut(): Promise<void> {
